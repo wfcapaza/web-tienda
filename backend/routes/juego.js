@@ -11,7 +11,6 @@ router.get("/", async (req, res) => {
     }
 });
 
-
 router.get('/nombre', async (req, res) => {
     try {
         const nombreJuego = req.query.nombre;
