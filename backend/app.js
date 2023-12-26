@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require('cors');
 const usuariosRouter = require('./routes/usuario');
 const juegosRouter = require('./routes/juego');
 const proveedoresRouter = require('./routes/proveedor');
@@ -8,6 +9,8 @@ const comprasRouter = require('./routes/compra');
 
 const app = express();
 app.use(express.json());
+
+app.use(cors());
 
 //EndPoints
 app.use("/usuario", usuariosRouter);

@@ -16,14 +16,14 @@ router.get('/nombre', async (req, res) => {
         const nombreJuego = req.query.nombre;
 
         if (!nombreJuego) {
-            return res.status(400).json({ error: 'El nombre del juego es requerido.' });
+            return res.status(400).json({ mensaje: 'El nombre del juego es requerido.' });
         }
 
         const juegos = await Juego.find({ nombre: { $regex: new RegExp(nombreJuego, 'i') } });
 
         res.status(200).json({ resultado: true, data: juegos });
     } catch (error) {
-        res.status(500).json({ error: 'Error interno del servidor' });
+        res.status(500).json({ mensaje: 'Error interno del servidor' });
     }
 });
 
@@ -33,14 +33,14 @@ router.get('/precio', async (req, res) => {
         const precioMax = parseFloat(req.query.max);
 
         if (isNaN(precioMin) || isNaN(precioMax)) {
-            return res.status(400).json({ error: 'Los precios deben ser números válidos.' });
+            return res.status(400).json({ mensaje: 'Los precios deben ser números válidos.' });
         }
 
         const juegos = await Juego.find({ precio: { $gte: precioMin, $lte: precioMax } });
 
         res.status(200).json({ resultado: true, data: juegos });
     } catch (error) {
-        res.status(500).json({ error: 'Error interno del servidor' });
+        res.status(500).json({ mensaje: 'Error interno del servidor' });
     }
 });
 
@@ -70,7 +70,6 @@ router.get('/nombre', async (req, res) => {
 
         res.status(200).json({ resultado: true, data: juegos });
     } catch (error) {
-        console.error('Error al buscar productos por nombre:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
