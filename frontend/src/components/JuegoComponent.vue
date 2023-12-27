@@ -23,44 +23,14 @@
             <label class="form-label">Precio máx.</label>
             <input v-model="filtroPrecioMax" type="number" class="form-control" placeholder="Máx."/>
         </div>
-        <div class="col-md-2 contenedorBoton">
-            <button class="btn btn-primary" @click="obtenerJuegosPorFiltro"><span class="material-icons align-middle">filter_alt</span>&nbsp;Buscar por filtro</button>
-        </div>
-        <div class="col-md-2 contenedorBoton">
+        <div class="col-md-4 contenedorBoton">
+            <button class="btn btn-primary" @click="obtenerJuegosPorFiltro"><span class="material-icons align-middle">filter_alt</span>&nbsp;Añadir filtro</button>&nbsp;&nbsp;
             <button class="btn btn-primary" @click="obtenerJuegos"><span class="material-icons align-middle">filter_alt_off</span>&nbsp;Quitar filtro</button>
         </div>
         <div class="col-md-2 contenedorBoton d-flex flex-row-reverse">
             <button class="btn btn-success" @click="mostrarModal(0)"><span class="material-icons align-middle">add</span>&nbsp;Agregar juego</button>
         </div>
     </div>    
-    <!-- <div class="col-md-12 mt-3">
-    <table class="table table-hover">
-<thead>
-    <tr>
-        <th></th>
-        <th>Nombre</th>
-        <th>Género</th>
-        <th>Precio</th>
-        <th>Cantidad</th>
-        <th></th>
-    </tr>
-</thead>
-<tbody>
-    <tr v-for="juego in listaJuegos">
-        <td><img :src="juego.urlImagen" alt="Imagen" height="150px"></td>
-        <td>{{ juego.nombre }}</td>
-        <td>{{ juego.genero }}</td>
-        <td>{{ juego.precio }}</td>
-        <td>{{ juego.cantidad }}</td>
-        <td class="text-center">
-            <button type="button" class="btn btn-success"><span class="material-icons align-middle">edit</span>&nbsp;Editar</button>
-            &nbsp;
-            <button type="button" class="btn btn-danger"><span class="material-icons align-middle">delete</span>&nbsp;Eliminar</button>
-        </td>
-    </tr>
-</tbody>
-    </table>
-</div> -->
     <div class="row">
         <div class="col-md-3 mt-3" v-for="juego in listaJuegos">
             <div class="card">
@@ -70,12 +40,25 @@
                 <p class="card-text">{{ juego.descripcion }}</p>
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><strong>Precio:</strong> S/. {{ juego.precio }} | <strong>Cantidad:</strong> {{ juego.cantidad }}</li>
-                <li class="list-group-item"><strong>Género:</strong> {{ juego.genero }}</li>
-            </ul>
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Precio:</strong> S/. {{ juego.precio }} </span>
+                        <span>&nbsp; | &nbsp;</span>
+                        <span><strong>Cantidad:</strong> {{ juego.cantidad }} </span>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Género:</strong> {{ juego.genero }}</span>
+                        <button type="button" title="Agregar Carrito" class="btn btn-warning" @click="agregarCarrito(juego._id)">
+                            <span class="material-icons">add_shopping_cart</span>
+                        </button>
+                    </div>
+                </li>
+             </ul>
             <div class="card-body d-flex justify-content-evenly">
                 <button type="button" class="btn btn-success" @click="mostrarModal(1, juego)"><span class="material-icons align-middle">edit</span>&nbsp;Editar</button>
-                <button type="button" class="btn btn-danger"><span class="material-icons align-middle">delete</span>&nbsp;Eliminar</button>
+                <button type="button" class="btn btn-danger" @click="eliminarJuego(juego._id)"><span class="material-icons align-middle">delete</span>&nbsp;Eliminar</button>
             </div>
             </div>
         </div>
@@ -120,7 +103,7 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary"><span class="material-icons align-middle">save</span>&nbsp;Guardar</button>
+            <button type="button" class="btn btn-primary" @click="crearEditarJuego(juego)"><span class="material-icons align-middle">save</span>&nbsp;Guardar</button>
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><span class="material-icons align-middle">cancel</span>&nbsp;Cerrar</button>            
           </div>
         </div>
@@ -133,6 +116,8 @@ import axios from "axios";
 import { ref } from "vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import Swal from 'sweetalert2';
+
 
 const backendServer = "http://127.0.0.1:3000";
 let listaJuegos = ref([]);
@@ -142,6 +127,11 @@ let filtroNombre = "";
 let filtroPrecioMin = 0;
 let filtroPrecioMax = 200;
 let tituloModal = ref("Nuevo Juego");
+let modalJuego = {};
+let accionRealizar = 0;
+let config_request = {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'}
+let usuario = ""
+
 
 const obtenerJuegosPorFiltro = () => {
     let endPoint = backendServer + "/juego";
@@ -168,14 +158,16 @@ const obtenerJuegosPorFiltro = () => {
 
 //accion 0=nuevo, 1=editar
 const mostrarModal = (accion, objeto = {}) => {    
-    let modalJuego = new bootstrap.Modal(document.getElementById('crearEditarModal'), { keyboard: false });
+    modalJuego = new bootstrap.Modal(document.getElementById('crearEditarModal'), { keyboard: false });
     
     if(accion == 1){
         juego.value = objeto;
+        accionRealizar = 1;
         tituloModal.value = "Editar Juego";
     }
     else{
         juego.value = {};
+        accionRealizar = 0;
         tituloModal.value = "Nuevo Juego";
     }
         
@@ -183,7 +175,60 @@ const mostrarModal = (accion, objeto = {}) => {
 }
 
 //accion 0=nuevo, 1=editar
-const crearEditarJuego = (accion) => {
+const crearEditarJuego = (objeto) => {
+    
+    if(accionRealizar == 0){
+        axios.post(backendServer + "/juego", objeto, { config_request })
+        .then(res => {
+            if(res.data.resultado){
+                obtenerJuegos();
+                toast.success("Se guardó exitosamente");
+                listaJuegos.value.push(objeto);
+                modalJuego.hide();
+            }                            
+        })
+        .catch(error => {
+            toast.error(error.response.data?.mensaje);
+        });
+    }else{
+        axios.patch(`${backendServer}/juego/${objeto._id}`, objeto, { config_request })
+        .then(res => {
+            if(res.data.resultado){
+                obtenerJuegos();
+                toast.success("Se actualizó exitosamente");
+                modalJuego.hide();
+            }                        
+        })
+        .catch(error => {
+            toast.error(error.response.data?.mensaje);
+        });
+    }
+}
+
+const eliminarJuego = (id) => {
+
+    Swal.fire({
+        title: "¿Estás seguro de eliminar el juego?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si, eliminar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.delete(`${backendServer}/juego/${id}`, {}, { config_request })
+                .then(res => {
+                    if (res.data.resultado) {
+                        obtenerJuegos();
+                        toast.success("Se eliminó correctamente");
+                    }
+                })
+                .catch(error => {
+                    toast.error(error.response.data?.mensaje);
+                });
+        }
+    });
     
 }
 
