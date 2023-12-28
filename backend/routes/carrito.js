@@ -42,7 +42,10 @@ router.post('/agregar', async (req, res) => {
         }
         else {
             carrito.juegos.push({
-                juego: juego._id,
+                juego: juego,
+                nombreJuego: juego.nombre,
+                precio: juego.precio,
+                urlImagenJuego: juego.urlImagen,
                 cantidad
             });
         }
@@ -66,7 +69,7 @@ router.delete("/:id", async (req, res) => {
             return res.status(400).json({ resultado: false, mensaje: 'Carrito no existe.' });
         }
 
-        res.status(200).json({ resultado: true, message: 'Carrito eliminado correctamente.' });
+        res.status(200).json({ resultado: true, mensaje: 'Carrito eliminado correctamente.' });
     }
     catch(error){
         res.status(500).json({ resultado: false, mensaje: error.message });

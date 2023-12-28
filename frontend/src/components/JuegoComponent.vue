@@ -49,10 +49,14 @@
                 </li>
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between">
-                        <span><strong>Género:</strong> {{ juego.genero }}</span>
-                        <button type="button" title="Agregar Carrito" class="btn btn-warning" @click="agregarCarrito(juego._id)">
-                            <span class="material-icons">add_shopping_cart</span>
-                        </button>
+                        <div class="col-md-6">
+                            <span><strong>Género:</strong> {{ juego.genero }}</span>
+                        </div>
+                        <div class="col-md-6 d-flex flex-row-reverse">
+                            <button type="button" title="Agregar Carrito" class="btn btn-warning" @click="openModalCarrito(juego)">
+                                <span class="material-icons">add_shopping_cart</span>
+                            </button>
+                        </div>
                     </div>
                 </li>
              </ul>
@@ -109,6 +113,34 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="agregarCarritoModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Agregar Carrito</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="col-form-label">Nombre</label>
+                        <input class="form-control" v-model="carrito.nombre" readonly/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label">Cantidad</label>
+                        <input class="form-control" type="number" v-model="carrito.cantidad" placeholder="Ingrese cantidad"/>
+                    </div>
+                </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" @click="agregarCarrito(carrito)"><span class="material-icons align-middle">save</span>&nbsp;Guardar</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><span class="material-icons align-middle">cancel</span>&nbsp;Cerrar</button>            
+          </div>
+        </div>
+      </div>
+    </div>
 </template>
 
 <script setup>
@@ -128,9 +160,10 @@ let filtroPrecioMin = 0;
 let filtroPrecioMax = 200;
 let tituloModal = ref("Nuevo Juego");
 let modalJuego = {};
+let modalCarrito = {};
 let accionRealizar = 0;
 let config_request = {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'}
-let usuario = ""
+let carrito = ref({});
 
 
 const obtenerJuegosPorFiltro = () => {
@@ -183,7 +216,6 @@ const crearEditarJuego = (objeto) => {
             if(res.data.resultado){
                 obtenerJuegos();
                 toast.success("Se guardó exitosamente");
-                listaJuegos.value.push(objeto);
                 modalJuego.hide();
             }                            
         })
@@ -230,6 +262,28 @@ const eliminarJuego = (id) => {
         }
     });
     
+}
+
+const openModalCarrito = (juego) => {
+    modalCarrito = new bootstrap.Modal(document.getElementById('agregarCarritoModal'), { keyboard: false });
+    carrito.value.juegoId = juego._id;
+    carrito.value.nombre = juego.nombre;
+    carrito.value.cantidad = 1;
+    carrito.value.correoUsuario = sessionStorage.getItem("correo");
+    modalCarrito.show();
+}
+
+const agregarCarrito = (objeto) => {
+    axios.post(backendServer + "/carrito/agregar", objeto, { config_request })
+        .then(res => {
+            if(res.data.resultado){
+                toast.success("Se agregó al carrito exitosamente");
+                modalCarrito.hide();
+            }                            
+        })
+        .catch(error => {
+            toast.error(error.response.data?.mensaje);
+        });
 }
 
 const obtenerJuegos = () => {

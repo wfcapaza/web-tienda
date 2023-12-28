@@ -18,34 +18,33 @@
     <div class="tab-content" id="nav-tabContent">
       <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
         <div class="col-md-12 mt-3">
-          <input class="form-control" placeholder="Ingrese correo electronico"/>
+          <input class="form-control" v-model="usuarioLogin.correo" placeholder="Ingrese correo electronico"/>
         </div>
         <div class="col-md-12 mt-3">
-          <input class="form-control" placeholder="Ingrese contraseña"/>
+          <input class="form-control" type="password" v-model="usuarioLogin.contrasenha" placeholder="Ingrese contraseña"/>
         </div>
         <div class="col-md-12 mt-3 text-center">
-          <button class="btn btn-primary" @click="iniciarSesion">Iniciar Sesión</button>
-          <RouterLink to="/juegos">Juegos</RouterLink>
+          <button class="btn btn-primary" @click="iniciarSesion(usuarioLogin)">Iniciar Sesión</button>
         </div>
       </div>
       <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
         <div class="col-md-12 mt-3">
-          <input class="form-control" type="text" placeholder="Ingrese nombre"/>
+          <input class="form-control" type="text" v-model="nuevoUsuario.nombre" placeholder="Ingrese nombre"/>
         </div>
         <div class="col-md-12 mt-3">
-          <input class="form-control" type="text" placeholder="Ingrese correo electronico"/>
+          <input class="form-control" type="text" v-model="nuevoUsuario.correo" placeholder="Ingrese correo electronico"/>
         </div>
         <div class="col-md-12 mt-3">
-          <input class="form-control" type="email" placeholder="Ingrese contraseña"/>
+          <input class="form-control" type="password" v-model="nuevoUsuario.contrasenha" placeholder="Ingrese contraseña"/>
         </div>
         <div class="col-md-12 mt-3">
-          <input class="form-control" type="number" placeholder="Ingrese edad"/>
+          <input class="form-control" type="number" v-model="nuevoUsuario.edad" placeholder="Ingrese edad"/>
         </div>
         <div class="col-md-12 mt-3">
-          <input class="form-control" type="text" placeholder="Ingrese país"/>
+          <input class="form-control" type="text" v-model="nuevoUsuario.pais" placeholder="Ingrese país"/>
         </div>
         <div class="col-md-12 mt-3 text-center">
-          <button class="btn btn-primary" @click="registrarse">Registrarse</button>
+          <button class="btn btn-primary" @click="registrarse(nuevoUsuario)">Registrarse</button>
         </div>
       </div>
     </div>
@@ -56,12 +55,50 @@
 </template>
 
 <script setup>
- const registrarse = () => {
-  console.log("registrarse");
- }
+import axios from "axios";
+import { ref } from "vue";
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import { useRouter } from 'vue-router';
 
- const iniciarSesion = () => {
-  console.log("iniciar sesión");
+const router = useRouter();
+
+const backendServer = "http://127.0.0.1:3000";
+let config_request = {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'};
+let nuevoUsuario = ref({});
+let usuarioLogin = {};
+//let router = this.$router;
+
+const registrarse = (objeto) => {
+  axios.post(backendServer + "/usuario", objeto, { config_request })
+    .then(res => {
+      if (res.data.resultado) {
+        nuevoUsuario.value = {};
+        toast.success("Se guardó exitosamente");
+      }
+    })
+    .catch(error => {
+      toast.error(error.response.data?.mensaje);
+    });
+}
+
+ const iniciarSesion = function(objeto) {
+
+  
+  axios.post(backendServer + "/usuario/login", objeto, { config_request })
+    .then(res => {
+      if (res.data.resultado) {        
+        sessionStorage.setItem("correo", objeto.correo)
+        usuarioLogin = {};
+        router.push("/juegos")
+      }
+      else {
+        toast.error("Su usuario o contraseña es incorrecto.");
+      }      
+    })
+    .catch(error => {
+      toast.error(error.response.data?.mensaje);
+    });
  }
 </script>
 

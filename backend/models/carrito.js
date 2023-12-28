@@ -7,6 +7,9 @@ const carritoSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Juego'
             },
+            nombreJuego: String,
+            precio: Number,
+            urlImagenJuego: String,
             cantidad: Number
         }
     ],
