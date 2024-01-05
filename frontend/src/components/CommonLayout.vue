@@ -20,6 +20,9 @@
                 <RouterLink class="nav-link d-flex align-center" aria-current="page" to="/carrito"><span class="material-icons">shopping_cart</span>&nbsp;Carrito</RouterLink>
             </li>
             <li class="nav-item">
+                <RouterLink class="nav-link d-flex align-center" aria-current="page" to="/compras"><span class="material-icons">history</span>&nbsp;Historial de Compras</RouterLink>
+            </li>
+            <li class="nav-item">
                 <RouterLink class="nav-link d-flex align-center" aria-current="page" to="/"><span class="material-icons">logout</span>Cerrar Sesión</RouterLink>
             </li>
           </ul>

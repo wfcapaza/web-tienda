@@ -8,6 +8,7 @@ import JuegoComponent from '../src/components/JuegoComponent.vue'
 import ProveedorComponent from '../src/components/ProveedorComponent.vue'
 import CarritoComponent from '../src/components/CarritoComponent.vue'
 import UsuarioComponent from '../src/components/UsuarioComponent.vue'
+import ComprasComponent from '../src/components/ComprasComponent.vue'
 
 const routes = [
     { path: "/", redirect: "/login"},
@@ -18,7 +19,8 @@ const routes = [
             { path: "juegos", component: JuegoComponent },
             { path: "proveedores", component: ProveedorComponent },
             { path: "usuarios", component: UsuarioComponent },
-            { path: "carrito", component: CarritoComponent }
+            { path: "carrito", component: CarritoComponent },
+            { path: "compras", component: ComprasComponent }
         ]
     },
 ];

@@ -178,7 +178,6 @@ const obtenerJuegosPorFiltro = () => {
 
     axios.get(endPoint)
         .then(res => {
-            console.log(res.data)
             if (res.data.resultado){
                 toast.success("Se filtró exitosamente");
                 listaJuegos.value = res.data.data;

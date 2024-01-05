@@ -69,6 +69,14 @@ router.post('/login', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
     try {
+
+        const datosUsuarioAnteriores = await Usuario.findById(req.params.id);
+
+        if (Boolean(req.body.contrasenha) && req.body.contrasenha !== datosUsuarioAnteriores.contrasenha) {
+            const saltRounds = 10;
+            req.body.contrasenha = await bcrypt.hash(req.body.contrasenha, saltRounds);
+        }
+
         const usuario = await Usuario.findByIdAndUpdate(
             req.params.id,
             req.body,

@@ -78,7 +78,7 @@ const obtenerCarrito = () => {
 const limpiarCarrito = (objeto) => {
 
     Swal.fire({
-        title: "¿Estás seguro de eliminar todo lo seleccionado en el carrito?",
+        title: "¿Estás seguro de eliminar el carrito?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
