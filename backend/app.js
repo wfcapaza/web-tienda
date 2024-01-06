@@ -12,6 +12,12 @@ app.use(express.json());
 
 app.use(cors());
 
+const path = __dirname + '/views/';
+app.use(express.static(path));
+app.get('/', function (req,res) {
+  res.sendFile(path + "index.html");
+});
+
 //EndPoints
 app.use("/usuario", usuariosRouter);
 app.use("/juego", juegosRouter);
